@@ -3,6 +3,23 @@ const path = require('path');
 const AdmZip = require('adm-zip');
 const xml2js = require('xml2js');
 
+// .env.local 파일이 존재하면 환경변수 수동 로드
+const envLocalPath = path.join(process.cwd(), '.env.local');
+if (fs.existsSync(envLocalPath)) {
+  const envContent = fs.readFileSync(envLocalPath, 'utf8');
+  envContent.split('\n').forEach(line => {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith('#')) {
+      const parts = trimmed.split('=');
+      const key = parts[0].trim();
+      const val = parts.slice(1).join('=').trim().replace(/^['"]|['"]$/g, '');
+      if (key && val) {
+        process.env[key] = val;
+      }
+    }
+  });
+}
+
 // Vercel 빌드 환경이나 로컬 환경에서 로딩
 const apiKey = process.env.DART_API_KEY;
 const CACHE_FILE_PATH = path.join(process.cwd(), 'public', 'corp_code_cache.json');
