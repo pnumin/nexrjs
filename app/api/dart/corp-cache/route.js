@@ -48,12 +48,15 @@ async function downloadAndCacheCorpCodes(apiKey) {
   }));
 
   // public 디렉토리 확인 및 저장
-  const publicDir = path.join(process.cwd(), 'public');
-  if (!fs.existsSync(publicDir)) {
-    fs.mkdirSync(publicDir, { recursive: true });
+  try {
+    const publicDir = path.join(process.cwd(), 'public');
+    if (!fs.existsSync(publicDir)) {
+      fs.mkdirSync(publicDir, { recursive: true });
+    }
+    fs.writeFileSync(CACHE_FILE_PATH, JSON.stringify(formatted, null, 2), 'utf8');
+  } catch (writeError) {
+    console.warn('⚠️ 캐시 파일 쓰기 실패 (서버리스/읽기전용 환경):', writeError.message);
   }
-
-  fs.writeFileSync(CACHE_FILE_PATH, JSON.stringify(formatted, null, 2), 'utf8');
   return formatted;
 }
 
